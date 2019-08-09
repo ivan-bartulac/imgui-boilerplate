@@ -1,0 +1,6 @@
+[submodule "etc/modules/stb"]
+	path = etc/modules/stb
+	url = https://github.com/nothings/stb.git
+[submodule "etc/modules/imgui"]
+	path = etc/modules/imgui
+	url = https://github.com/ocornut/imgui.git
