@@ -1,2 +1,2 @@
 # imgui-boilerplate
-Boilerplate project for quick start with using dear imgui
+imgui boilerplate for using imgui with OpenGL3 and GLFW
