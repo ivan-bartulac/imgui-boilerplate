@@ -1,2 +1,6 @@
 # imgui-boilerplate
-imgui boilerplate for using imgui with OpenGL3 and GLFW
+boilerplate project for using imgui with OpenGL3 and GLFW
+
+## Windows.
+- Install visual studio.
+- Run the Build batch scripts to compile the project.
