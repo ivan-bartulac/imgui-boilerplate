@@ -1,5 +1,5 @@
 @echo off
-setlocal enabledelayedexpansion
+rem setlocal enabledelayedexpansion
 set target=debug
 
 for %%a in (%cd%) do set "project_name=%%~na"
@@ -23,6 +23,7 @@ if %target% == "release" (
 set source_dir=..\..\src
 set include_dir=..\..\etc\include
 set library_dir=..\..\etc\lib\win32
+set library_src_dir=..\..\etc\lib\src
 set module_dir=..\..\etc\modules
 set binary_dir=bin
 set obj_dir_name=_intermediate
@@ -46,7 +47,7 @@ if not defined DevEnvDir (
 )
 pushd %obj_dir%
     set cpp_files=%source_dir%\main.cpp %module_dir%\imgui\imgui.cpp %module_dir%\imgui\imgui_demo.cpp %module_dir%\imgui\imgui_draw.cpp %module_dir%\imgui\imgui_widgets.cpp %module_dir%\imgui\examples\imgui_impl_glfw.cpp %module_dir%\imgui\examples\imgui_impl_opengl3.cpp
-    cl /cgthreads8 /nologo %target_options% /I%include_dir% /I%module_dir% /I%module_dir%\imgui /Tp %cpp_files% /Tc %source_dir%\gl3w.c /link /SUBSYSTEM:WINDOWS /ENTRY:"mainCRTStartup" /OUT:..\%project_name%.exe opengl32.lib gdi32.lib User32.lib shell32.lib %library_dir%\glfw3.lib
+    cl /cgthreads8 /nologo %target_options% /I%include_dir% /I%module_dir% /I%module_dir%\imgui /Tp %cpp_files% /Tc %library_src_dir%\gl3w.c /link /SUBSYSTEM:WINDOWS /ENTRY:"mainCRTStartup" /OUT:..\%project_name%.exe opengl32.lib gdi32.lib User32.lib shell32.lib %library_dir%\glfw3.lib
     if exist ..\%project_name%.ilk (
         del ..\%project_name%.ilk
     )
