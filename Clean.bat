@@ -1,2 +1,2 @@
 @echo off
-call BuildDebug clean
+call BuildDebug.bat clean
