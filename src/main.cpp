@@ -2,9 +2,6 @@
 #include <examples/imgui_impl_glfw.h>
 #include <examples/imgui_impl_opengl3.h>
 
-#define STB_IMAGE_IMPLEMENTATION
-#include <stb/stb_image.h>
-
 #include <GL/gl3w.h>
 #include <GLFW/glfw3.h>
 
@@ -14,16 +11,19 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#include "GetConfigPath.h"
+#include "Utility.h"
+#include "GLTexture.h"
 
-static char* CompanyName = "YourCompanyName";
-static char* ProductName = "ImGui-Boilerplate";
-
-static int AtlasWith, AtlasHeight, AtlasChannels;
-static GLuint AtlasTextureID;
-static GLFWwindow* window;
-static char* GuiSessionPath = nullptr;
-static char* SettingsConfigPath = nullptr;
+struct ApplicationData
+{
+	char*		CompanyName			= "YourCompanyName";
+	char*		ProductName			= "ImGui-Boilerplate";
+	char*		GuiSessionPath		= nullptr;
+	char*		SettingsConfigPath	= nullptr;
+	GLTexture	IconAtlas;
+	GLFWwindow*	Window;
+};
+ApplicationData GAppData;
 
 static void error_callback(int error, const char* description)
 {
@@ -38,24 +38,13 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 
 void InitializeApplication()
 {
-	GuiSessionPath = GetConfigPath(CompanyName, ProductName, "GuiSession.ini");
-	SettingsConfigPath = GetConfigPath(CompanyName, ProductName, "Settings.ini");
+	GAppData.GuiSessionPath = GetConfigPath(GAppData.CompanyName, GAppData.ProductName, "GuiSession.ini");
+	GAppData.SettingsConfigPath = GetConfigPath(GAppData.CompanyName, GAppData.ProductName, "Settings.ini");
 }
 
-void Initialize()
+void InitializeGL()
 {
-	unsigned char *AtlasPixelData = stbi_load("IconAtlas.tga", &AtlasWith, &AtlasHeight, &AtlasChannels, 4);
-
-	glGenTextures(1, &AtlasTextureID);
-	glBindTexture(GL_TEXTURE_2D, AtlasTextureID);
-    
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    //glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, AtlasWith, AtlasHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, AtlasPixelData);
-
-    glBindTexture(GL_TEXTURE_2D, 0);
-	stbi_image_free(AtlasPixelData);
+	GAppData.IconAtlas.Load("IconAtlas.tga");
 }
 
 void UpdateGUI()
@@ -86,21 +75,21 @@ void UpdateGUI()
 		 
 		if (ImGui::Button("Quit"))
 		{
-			glfwSetWindowShouldClose(window, GLFW_TRUE);
+			glfwSetWindowShouldClose(GAppData.Window, GLFW_TRUE);
 		}
 
 		float TileSize = 64.f;
-		float NumVerticalTiles = AtlasWith / TileSize;
-		float NumHorizontalTiles = AtlasHeight / TileSize;
+		float NumVerticalTiles = GAppData.IconAtlas.Width / TileSize;
+		float NumHorizontalTiles = GAppData.IconAtlas.Height / TileSize;
 		float TileRowIndex = 0;
 		float TileColIndex = 0;
 		
 		ImGui::PushID("ImageButton1");
-		if (ImGui::ImageButton((void*)(intptr_t)AtlasTextureID, ImVec2(TileSize, TileSize), 
+		if (ImGui::ImageButton((void*)(intptr_t)GAppData.IconAtlas.Id, ImVec2(TileSize, TileSize), 
 			ImVec2(TileRowIndex * (1 / NumVerticalTiles), TileColIndex * (1 / NumHorizontalTiles)), 
 			ImVec2((TileRowIndex + 1) * (1 / NumVerticalTiles), (TileColIndex + 1) * (1 / NumHorizontalTiles)), 0))
 		{
-			glfwSetWindowShouldClose(window, GLFW_TRUE);
+			glfwSetWindowShouldClose(GAppData.Window, GLFW_TRUE);
 		}
 		ImGui::PopID();
 
@@ -109,11 +98,11 @@ void UpdateGUI()
 		ImGui::PushID("ImageButton2");
 		TileRowIndex = 1;
 		TileColIndex = 0;
-		if (ImGui::ImageButton((void*)(intptr_t)AtlasTextureID, ImVec2(TileSize, TileSize), 
+		if (ImGui::ImageButton((void*)(intptr_t)GAppData.IconAtlas.Id, ImVec2(TileSize, TileSize), 
 			ImVec2(TileRowIndex * (1 / NumVerticalTiles), TileColIndex * (1 / NumHorizontalTiles)), 
 			ImVec2((TileRowIndex + 1) * (1 / NumVerticalTiles), (TileColIndex + 1) * (1 / NumHorizontalTiles)), 0))
 		{
-			glfwSetWindowShouldClose(window, GLFW_TRUE);
+			glfwSetWindowShouldClose(GAppData.Window, GLFW_TRUE);
 		}
 		ImGui::PopID();
 
@@ -149,16 +138,16 @@ int main(void)
 	//glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);            // 3.0+ only
 #endif
 
-	window = glfwCreateWindow(800, 600, ProductName, NULL, NULL);
-	if (!window)
+	GAppData.Window = glfwCreateWindow(800, 600, GAppData.ProductName, NULL, NULL);
+	if (!GAppData.Window)
 	{
 		glfwTerminate();
 		exit(EXIT_FAILURE);
 	}
 
-	glfwSetKeyCallback(window, key_callback);
+	glfwSetKeyCallback(GAppData.Window, key_callback);
 
-	glfwMakeContextCurrent(window);
+	glfwMakeContextCurrent(GAppData.Window);
 	
 	if (gl3wInit())
 	{
@@ -182,17 +171,17 @@ int main(void)
 	ImGui::CreateContext();
 	ImGuiIO& io = ImGui::GetIO(); (void)io;
 	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
-	io.IniFilename = GuiSessionPath;
+	io.IniFilename = GAppData.GuiSessionPath;
 	
 	ImGui::StyleColorsDark();
 
-	ImGui_ImplGlfw_InitForOpenGL(window, true);
+	ImGui_ImplGlfw_InitForOpenGL(GAppData.Window, true);
 	ImGui_ImplOpenGL3_Init(glsl_version);
 
 
-	Initialize();
+	InitializeGL();
 
-	while (!glfwWindowShouldClose(window))
+	while (!glfwWindowShouldClose(GAppData.Window))
 	{
 		glfwPollEvents();
 
@@ -205,20 +194,20 @@ int main(void)
 		ImGui::Render();
 
 		int width, height;
-		glfwGetFramebufferSize(window, &width, &height);
+		glfwGetFramebufferSize(GAppData.Window, &width, &height);
 		glViewport(0, 0, width, height);
 		glClearColor(0.f, 0.f, 0.f, 1.f);
 		glClear(GL_COLOR_BUFFER_BIT);
 		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
-		glfwSwapBuffers(window);
+		glfwSwapBuffers(GAppData.Window);
 	}
 
 	ImGui_ImplOpenGL3_Shutdown();
 	ImGui_ImplGlfw_Shutdown();
 	ImGui::DestroyContext();
 
-	glfwDestroyWindow(window);
+	glfwDestroyWindow(GAppData.Window);
 	glfwTerminate();
 	exit(EXIT_SUCCESS);
 }

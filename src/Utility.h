@@ -1,5 +1,5 @@
-#ifndef _GET_RESOURCE_PATH
-#define _GET_RESOURCE_PATH
+#ifndef _UTILITY
+#define _UTILITY
 
 
 #ifdef _WIN32 
