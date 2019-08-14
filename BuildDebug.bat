@@ -19,7 +19,12 @@ if "%1" == "release" (
 	set target="release"
 )
 
+if "%2" == "clean" (
+	goto :CLEAN
+)
+
 if "%1" == "clean" (
+	:CLEAN
 	if exist %obj_dir% (
 		echo Cleaning Project: %project_name%
 		rmdir /Q /S %obj_dir%
@@ -29,10 +34,13 @@ if "%1" == "clean" (
 )
 
 if %target% == "release" (
-	set target_options=/D_RELEASE /O2 /Ot
+	set target_compiler_options=/D_RELEASE /O2 /Ot /MT
+	set target_linker_options=/ENTRY:"mainCRTStartup" /SUBSYSTEM:WINDOWS 
+
 ) else (
 	set project_name=%project_name%_%target%
-	set target_options=/D_DEBUG /Zi /Od 
+	set target_compiler_options=/D_DEBUG /Zi /Od /MTd /Gm 
+	set target_linker_options=/ENTRY:"mainCRTStartup" /SUBSYSTEM:WINDOWS /ignore:4098 
 )
 
 if not exist %obj_dir% (
@@ -46,15 +54,28 @@ if not defined DevEnvDir (
 echo Building Project: %project_name%
 pushd %obj_dir%
 	set cpp_files=%source_dir%\main.cpp %module_dir%\imgui\imgui.cpp %module_dir%\imgui\imgui_demo.cpp %module_dir%\imgui\imgui_draw.cpp %module_dir%\imgui\imgui_widgets.cpp %module_dir%\imgui\examples\imgui_impl_glfw.cpp %module_dir%\imgui\examples\imgui_impl_opengl3.cpp
-	cl /cgthreads8 /nologo %target_options% /I%include_dir% /I%module_dir% /I%module_dir%\imgui /Tp %cpp_files% /Tc %library_src_dir%\gl3w.c /link /SUBSYSTEM:WINDOWS /ENTRY:"mainCRTStartup" /OUT:..\%project_name%.exe opengl32.lib gdi32.lib User32.lib shell32.lib %library_dir%\glfw3.lib
+	cl /cgthreads8 /nologo /EHsc %target_compiler_options% /I%include_dir% /I%module_dir% /I%module_dir%\imgui /Tp %cpp_files% /Tc %library_src_dir%\gl3w.c /link /OUT:..\%project_name%.exe %target_linker_options% opengl32.lib gdi32.lib User32.lib shell32.lib shlwapi.lib %library_dir%\glfw3.lib
 	if exist ..\%project_name%.ilk (
 		del ..\%project_name%.ilk
 	)
 popd
 call :CHECK_FAIL
 
+
+if "%1" == "run" call :RUN_EXE
+if "%2" == "run" call :RUN_EXE
+
 :: ---- Function Section Begin
 goto :EOF
+
+:RUN_EXE
+if NOT %errorlevel% gtr 0 (
+	pushd %binary_dir%
+		echo Running: %project_name%
+		start %project_name%.exe
+	popd
+)
+exit /b 0
 
 :CHECK_FAIL
 if NOT ["%errorlevel%"]==["0"] (

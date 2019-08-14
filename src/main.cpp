@@ -1,19 +1,29 @@
-#include "imgui.h"
-#include "examples/imgui_impl_glfw.h"
-#include "examples/imgui_impl_opengl3.h"
+#include <imgui.h>
+#include <examples/imgui_impl_glfw.h>
+#include <examples/imgui_impl_opengl3.h>
 
 #define STB_IMAGE_IMPLEMENTATION
-#include "stb/stb_image.h"
+#include <stb/stb_image.h>
 
 #include <GL/gl3w.h>
 #include <GLFW/glfw3.h>
 
+#include <clocale>
+#include <string>
+#include <comdef.h>
 #include <stdlib.h>
 #include <stdio.h>
+
+#include "GetConfigPath.h"
+
+static char* CompanyName = "YourCompanyName";
+static char* ProductName = "ImGui-Boilerplate";
 
 static int AtlasWith, AtlasHeight, AtlasChannels;
 static GLuint AtlasTextureID;
 static GLFWwindow* window;
+static char* GuiSessionPath = nullptr;
+static char* SettingsConfigPath = nullptr;
 
 static void error_callback(int error, const char* description)
 {
@@ -24,6 +34,12 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 {
 	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
 		glfwSetWindowShouldClose(window, GLFW_TRUE);
+}
+
+void InitializeApplication()
+{
+	GuiSessionPath = GetConfigPath(CompanyName, ProductName, "GuiSession.ini");
+	SettingsConfigPath = GetConfigPath(CompanyName, ProductName, "Settings.ini");
 }
 
 void Initialize()
@@ -110,6 +126,8 @@ void UpdateGUI()
 
 int main(void)
 {
+	InitializeApplication();
+
 	glfwSetErrorCallback(error_callback);
 
 	if (!glfwInit())
@@ -131,7 +149,7 @@ int main(void)
 	//glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);            // 3.0+ only
 #endif
 
-	window = glfwCreateWindow(800, 600, "DearIMGUIStartupProject", NULL, NULL);
+	window = glfwCreateWindow(800, 600, ProductName, NULL, NULL);
 	if (!window)
 	{
 		glfwTerminate();
@@ -159,16 +177,18 @@ int main(void)
 	printf("OpenGL %s, GLSL %s\n", glGetString(GL_VERSION), glGetString(GL_SHADING_LANGUAGE_VERSION));
 
 	glfwSwapInterval(1);
-
+	
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
 	ImGuiIO& io = ImGui::GetIO(); (void)io;
 	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
-
+	io.IniFilename = GuiSessionPath;
+	
 	ImGui::StyleColorsDark();
 
 	ImGui_ImplGlfw_InitForOpenGL(window, true);
 	ImGui_ImplOpenGL3_Init(glsl_version);
+
 
 	Initialize();
 

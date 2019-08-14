@@ -1,2 +1,2 @@
 @echo off
-call BuildDebug.bat release
+call BuildDebug.bat release %1
