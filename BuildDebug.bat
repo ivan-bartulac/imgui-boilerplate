@@ -53,8 +53,9 @@ if not defined DevEnvDir (
 
 echo Building Project: %project_name%
 pushd %obj_dir%
-	set cpp_files=%source_dir%\main.cpp %module_dir%\imgui\imgui.cpp %module_dir%\imgui\imgui_demo.cpp %module_dir%\imgui\imgui_draw.cpp %module_dir%\imgui\imgui_widgets.cpp %module_dir%\imgui\examples\imgui_impl_glfw.cpp %module_dir%\imgui\examples\imgui_impl_opengl3.cpp
-	cl /cgthreads8 /nologo /EHsc %target_compiler_options% /I%include_dir% /I%module_dir% /I%module_dir%\imgui /Tp %cpp_files% /Tc %library_src_dir%\gl3w.c /link /OUT:..\%project_name%.exe %target_linker_options% opengl32.lib gdi32.lib User32.lib shell32.lib shlwapi.lib %library_dir%\glfw3.lib
+	set cpp_files=%source_dir%\main.cpp %source_dir%\Utility.cpp %source_dir%\GLTexture.cpp %source_dir%\GUI.cpp
+	set module_cpp_files=%module_dir%\imgui\imgui.cpp %module_dir%\imgui\imgui_demo.cpp %module_dir%\imgui\imgui_draw.cpp %module_dir%\imgui\imgui_widgets.cpp %module_dir%\imgui\examples\imgui_impl_glfw.cpp %module_dir%\imgui\examples\imgui_impl_opengl3.cpp
+	cl /cgthreads8 /nologo /EHsc %target_compiler_options% /I%include_dir% /I%module_dir% /I%module_dir%\imgui /Tp %cpp_files% %module_cpp_files% /Tc %library_src_dir%\gl3w.c /link /OUT:..\%project_name%.exe %target_linker_options% opengl32.lib gdi32.lib User32.lib shell32.lib shlwapi.lib %library_dir%\glfw3.lib
 	if exist ..\%project_name%.ilk (
 		del ..\%project_name%.ilk
 	)

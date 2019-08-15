@@ -1,64 +1,27 @@
 #ifndef _UTILITY
 #define _UTILITY
 
+#include <GL/gl3w.h>
+#include <GLFW/glfw3.h>
+#include <imgui.h>
 
-#ifdef _WIN32 
-#include <shlwapi.h>
-#include <Shlobj.h>
-#include <Shlobj_core.h>
-#include <string>
+#include "GLTexture.h"
 
-char* GetConfigPath(const char* CompanyName, const char* ProductName, const char* FileName = "")
+struct ApplicationData
 {
-	char* spacer = "\\";
-	char* szPath = std::getenv("APPDATA");
-	char* result = new char[1024];
-	if(szPath != nullptr)
-	{
-		strcpy(result, szPath);
-		strcat(result, spacer);
-		strcat(result, CompanyName);
-		strcat(result, spacer);
-		strcat(result, ProductName);
+	char*				CompanyName			= "YourCompanyName";
+	char*				ProductName			= "ImGui-Boilerplate";
+	char*				GuiSessionPath		= nullptr;
+	char*				SettingsConfigPath	= nullptr;
+	ImGuiWindowFlags	WindowFlags			= 0;
+	GLTexture			IconAtlas;
+	GLFWwindow*	Window;
+};
 
-		if(!PathFileExistsA(result))
-		{
-			if(!SHCreateDirectoryEx(NULL, result, NULL) == ERROR_SUCCESS)
-			{
-				fprintf(stderr, "Failed to create config directory.");
-			}
-		}
-
-		if (FileName[0] != '\0')
-		{
-			strcat(result, spacer);
-			strcat(result, FileName);
-		}
-		
-		return result;
-	}
-
-	fprintf(stderr, "Failed to find config directory.");
-	return result;
-}
-
-#elif __linux__
-
-wchar_t* GetConfigPath()
+namespace Util
 {
-	// TODO: implement for platform
-	return nullptr;
+	char* GetConfigPath(const char* CompanyName, const char* ProductName, const char* FileName = "");
 }
-
-#elif __APPLE__
-
-wchar_t* GetConfigPath()
-{
-	// TODO: implement for platform
-	return nullptr;
-}
-
-#endif
 
 
 #endif 
