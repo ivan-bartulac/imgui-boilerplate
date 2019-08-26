@@ -1,0 +1,53 @@
+{
+	"folders":
+	[
+		{
+			"name": "Source",
+			"path": "src"
+		},
+		{
+			"name": "External",
+			"path": "etc/lib/src"
+		},
+		{
+			"path": "etc/modules/imgui"
+		},
+		{
+			"path": "etc/modules/stb"
+		}
+	],
+
+	"build_systems":
+	[
+		{
+			"name": "BuildRunDebug",
+			"working_dir": "${project_path}/bin",
+			"shell_cmd": "${project_path}/BuildDebug.bat run"
+		},
+
+		{
+			"name": "BuildRunRelease",
+			"working_dir": "${project_path}/bin",
+			"shell_cmd": "${project_path}/BuildDebug.bat release run"
+		},
+
+		{
+			"name": "BuildDebug",
+			"working_dir": "${project_path}/bin",
+			"shell_cmd": "${project_path}/BuildDebug.bat"
+		},
+
+		{
+			"name": "BuildRelease",
+			"working_dir": "${project_path}/bin",
+			"shell_cmd": "${project_path}/BuildDebug.bat release"
+		},
+
+		{
+			"name": "Clean",
+			"working_dir": "${project_path}/bin",
+			"shell_cmd": "${project_path}/BuildDebug.bat clean"
+		}
+	]
+
+}
