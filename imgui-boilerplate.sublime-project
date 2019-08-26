@@ -2,18 +2,7 @@
 	"folders":
 	[
 		{
-			"name": "Source",
-			"path": "src"
-		},
-		{
-			"name": "External",
-			"path": "etc/lib/src"
-		},
-		{
-			"path": "etc/modules/imgui"
-		},
-		{
-			"path": "etc/modules/stb"
+			"path": "."
 		}
 	],
 
