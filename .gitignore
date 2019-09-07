@@ -2,3 +2,5 @@
 *.sublime-workspace
 
 .vs
+.vscode
+.DS_Store
