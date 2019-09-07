@@ -50,7 +50,7 @@ wchar_t* Util::GetConfigPath()
 
 #elif __APPLE__
 
-wchar_t* Util::GetConfigPath()
+char* Util::GetConfigPath(const char* CompanyName, const char* ProductName, const char* FileName)
 {
 	// TODO: implement for platform
 	return nullptr;
